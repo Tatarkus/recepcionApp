@@ -10,7 +10,6 @@
      <BusyTableCard :busy_tables="busy_tables" @freeThisTable="unasign($event)"
      />
 
-
     </div>
   </div>
 </template>
@@ -76,6 +75,7 @@ export default {
     }
   },
   methods: {
+    //TODO: Implement API communication using AXIOS
            asignTable(table, reservation) {
              if(this.waiterSelected)
               {
