@@ -13,10 +13,11 @@
     <q-card class="my-card mifila"
 
     v-for="table in tables"
-    :key="table.id">
+    :key="table.id"
+    >
     <q-card-section >
       <div class="text-center text-h6">Mesa {{ table.id }}</div>
-      <div class="text-subtitle2 text-center">{{ table.capacidad }} personas</div>
+      <div class="text-subtitle2 text-center">{{ table.capacity }} personas</div>
     </q-card-section>
 <!--emit-->
     <q-separator />
@@ -36,6 +37,7 @@ export default {
   props: {
     tables: {}
   },
+  
   methods: {
     asign(table){
       this.$emit('asignThisTable',table)
@@ -45,7 +47,10 @@ export default {
     return {
 
     }
-  }
+  },
+  },
+  created(){
+    
   }
 }
 

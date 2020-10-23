@@ -17,6 +17,7 @@
 import TableCard from 'components/TableCard.vue'
 import WaiterList from 'components/WaiterList.vue'
 import BusyTableCard from 'components/BusyTableCard.vue'
+import axios from 'axios'
 //TODO: comunicarse con el hermano
 export default {
   name: 'MainPage',
@@ -28,44 +29,7 @@ export default {
   },
   data(){
     return {
-      tables:[
-        {
-          id:1,
-          desc:"hola 1",
-          capacidad: 2
-        },
-        {
-          id:2,
-          desc:"hola 2",
-          capacidad: 3
-        },
-        {
-          id:3,
-          desc:"hola 2",
-          capacidad: 4
-        },
-        {
-          id:4,
-          desc:"hola 2",
-          capacidad: 1
-        },
-        {
-          id:5,
-          desc:"hola 2",
-          capacidad: 5
-        },
-        {
-          id:6,
-          desc:"hola 2",
-          capacidad: 6
-        },
-        {
-          id:7,
-          desc:"hola 2",
-          capacidad: 2
-        },
-
-      ],
+      tables:[],
       busy_tables:[],
       waiterName:"",
       waiterSelected:false,
@@ -73,6 +37,12 @@ export default {
       removeTableFrom:"",
       addTableTo:"",
     }
+  },
+  created( ){
+    axios
+      .get('http://18.229.150.241:8081/admin/tables/',{ crossDomain: true })
+      .then(response => (this.tables = response.data.tables))
+      console.log(this.tables)
   },
   methods: {
     //TODO: Implement API communication using AXIOS
