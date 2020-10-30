@@ -22,8 +22,6 @@
       <q-toolbar>
               <q-tabs align="center">
                 <q-route-tab to="/" label="Principal" />
-                <q-route-tab to="/meseros" label="Meseros" />
-                <q-route-tab to="/reservas" label="Reservas" />
               </q-tabs>
       </q-toolbar>
     </q-footer>

@@ -4,9 +4,9 @@
 
     <div class="row justify-around">
 
-     <TableCard :tables="tables" @asignThisTable="asignTable($event)"
+     <TableCard :tables="free_tables" @asignThisTable="asignTable($event)"
      />
-     <WaiterList :addTableTo="addTableTo" :removeTableFrom="removeTableFrom" @readyToServe="serveTable($event)"/>
+     <WaiterList :waiters="waiters" :addTableTo="addTableTo" :removeTableFrom="removeTableFrom" @readyToServe="serveTable($event)"/>
      <BusyTableCard :busy_tables="busy_tables" @freeThisTable="unasign($event)"
      />
 
@@ -30,8 +30,10 @@ export default {
   data(){
     return {
       tables:[],
+      waiters:[],
+      free_tables:[],
       busy_tables:[],
-      waiterName:"",
+      waiter:"",
       waiterSelected:false,
       tableSelected:{},
       removeTableFrom:"",
@@ -39,11 +41,29 @@ export default {
     }
   },
   created( ){
-    axios
-      .get('http://18.229.150.241:8081/admin/tables/',{ crossDomain: true })
-      .then(response => (this.tables = response.data.tables))
-      console.log(this.tables)
-  },
+    axios.all([
+      axios.get('http://18.229.150.241:8081/admin/tables/',{ crossDomain: true }),
+      axios.get('http://18.229.150.241:8081/admin/waiters/',{ crossDomain: true })
+    ])  
+    .then(axios.spread((tableRes, waiterRes) => {
+        this.tables = tableRes.data.tables,
+        this.waiters=waiterRes.data,  
+        this.tables.forEach(table => {
+          if(table.waiterId === null){
+            this.free_tables.push(table)
+          } else{
+           this.waiters.forEach(waiter => {  
+             if(waiter.id === table.waiterId){
+
+              table.waiter = waiter.name
+              this.busy_tables.push(table)
+               
+             }
+           });
+            
+          }
+        })}))
+    },
   methods: {
     //TODO: Implement API communication using AXIOS
            asignTable(table, reservation) {
@@ -53,15 +73,24 @@ export default {
                 {
                   id:table.id,
                   isReserved:reservation,
-                  waiter:this.waiterName
+                  waiter:this.waiter.name +" "+this.waiter.lastName
+                }
+                var updateTable=
+                {
+                  customerId:table.customerId,
+                  waiterId:this.waiter.id,
+                  
                 }
                 this.busy_tables.push(busyTable)
+                console.log(this.free_tables)
                 for (var i = 0; i < this.tables.length; i++) {
-                    if(this.tables[i]==table)
-                    this.tables.splice(i,1)
+                    if(this.free_tables[i]==table)
+                    this.free_tables.splice(i,1)
                   }
-                  this.addTableTo = this.waiterName
-                  this.waiterName=""
+                  axios
+                  .put('http://18.229.150.241:8081/admin/tables/'+busyTable.id,updateTable)
+                  this.addTableTo = this.waiter
+                  this.waiter=""
                   this.waiterSelected=false
                   this.tableSelected={}
 
@@ -71,23 +100,27 @@ export default {
                }
              },
            unasign(table) {
-             this.removeTableFrom = this.waiterName
-             this.tables.push(table)
+             this.removeTableFrom = this.waiter
+             table.waiterId=null
+             table.customerId=null
+             this.free_tables.push(table)
+             axios
+              .put('http://18.229.150.241:8081/admin/tables/'+table.id,table)
              for (var i = 0; i < this.busy_tables.length; i++) {
                if(this.busy_tables[i]==table)
                 this.busy_tables.splice(i,1)
              }
 
            },
-           serveTable(waiterName){
-             this.waiterName = waiterName
+           serveTable(waiter){
+             this.waiter = waiter
              this.waiterSelected=true
              if(typeof this.tableSelected.id !== 'undefined' ){
-               console.log("asignando tabla "+this.tableSelected.id)
+               //console.log("asignando mesa "+this.tableSelected.id)
                this.asignTable(this.tableSelected)
 
              }else{
-               console.log("no hay tabla "+this.tableSelected.id)
+               //console.log("no hay tabla "+this.tableSelected.id)
              this.waiterSelected=true
              }
            },

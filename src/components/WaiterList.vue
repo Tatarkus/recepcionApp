@@ -11,9 +11,9 @@
   <div class=" mifila q-pa-md">
       <q-table
         class="my-sticky-header-table"
-        :data="data"
+        :data="waiters"
         :columns="columns"
-        row-key="name"
+        row-key="id"
         flat
         :selected.sync="selection"
         bordered
@@ -28,6 +28,9 @@
 <script>
 export default {
   props: ['addTableTo','removeTableFrom'],
+  props:{
+    waiters:{}
+  },
   watch:{
     'addTableTo' : function() {
       this.addTable()
@@ -38,7 +41,8 @@ export default {
     onRowClick (evt, row) {
       this.clickedOn=true
       this.selection = [row]
-      this.$emit('readyToServe',row.name)
+      this.$emit('readyToServe',this.selection[0])
+      
     },
     addTable(){
       console.log("aumentando")
@@ -73,38 +77,16 @@ export default {
       selection: [],
       columns: [
         {
-          name: 'Nombre',
+          name: 'name',
           required: true,
           label: 'Nombre',
           align: 'left',
-          field: row => row.name,
+          field: row => row.name +' '+row.lastName,
           format: val => `${val}`,
         }
       ],
       clickedOn:false,
 
-      data: [
-        {
-          name: 'Matías Fuentes',
-          mesas: '0',
-
-        },
-        {
-          name: 'Tomás Farías',
-          mesas: '0',
-
-        },
-        {
-          name: 'Lucas Aedo',
-          mesas: '0',
-
-        },
-        {
-          name: 'Roberto Ffrench-davis',
-          mesas: '0',
-
-        }
-      ]
     }
   }
 }
