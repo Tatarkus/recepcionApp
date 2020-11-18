@@ -27,6 +27,8 @@ import 'quasar/dist/quasar.sass'
 
 import 'src/css/app.sass'
 
+import 'src/css/main.sass'
+
 
 import Vue from 'vue'
 import createApp from './app.js'

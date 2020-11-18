@@ -18,13 +18,7 @@
       <router-view />
     </q-page-container>
 
-    <q-footer bordered class="bg-grey-8 text-white">
-      <q-toolbar>
-              <q-tabs align="center">
-                <q-route-tab to="/" label="Principal" />
-              </q-tabs>
-      </q-toolbar>
-    </q-footer>
+
 
   </q-layout>
 </template>

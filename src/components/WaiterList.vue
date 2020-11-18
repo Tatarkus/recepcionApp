@@ -1,15 +1,5 @@
 <template>
-  <div class="tablebanner q-gutter-sm col-3">
-  <q-banner rounded class="bg-cyan-5 text-white text-center">
-
-   Meseros
-
-
-  </q-banner>
-<div class="colu col-3">
-
-  <div class=" mifila q-pa-md">
-      <q-table
+    <q-table
         class="my-sticky-header-table"
         :data="waiters"
         :columns="columns"
@@ -20,10 +10,6 @@
         hide-bottom
         @row-click="onRowClick"
       />
-      </div>
-    </div>
-  </div>
-
 </template>
 <script>
 export default {
@@ -101,20 +87,6 @@ export default {
   </style>
 
   <style lang="sass" scoped>
-
-
-  .q-pa-md
-    width: 100%
-    min-width: 20%
-    margin: 0px
-    padding: 0px
-    .tablebanner
-      padding-top: 16px
-
-    .my-card
-      width: 100%
-      max-width: 200px
-      margin-bottom: 10px
     .my-sticky-header-table
         /* height or max-height is important */
         height: 310px

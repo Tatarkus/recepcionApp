@@ -1,30 +1,59 @@
-
 <template>
+
   <div class="q-pa-md doc-container">
+    <div class="text-center row justify-around banner-row">
+      <q-banner rounded class="banner-tables bg-blue-5 text-white">
+      Mesas Libres
+      </q-banner>
+
+      <q-banner rounded class="banner-waiters bg-cyan-5 text-white">
+      Meseros
+      </q-banner>
+
+      <q-banner rounded class="banner-busy bg-red-5 text-white">
+      Mesas Ocupadas
+      </q-banner>
+    </div>
 
     <div class="row justify-around">
 
-     <TableCard :tables="free_tables" @asignThisTable="asignTable($event)"
-     />
-     <WaiterList :waiters="waiters" :addTableTo="addTableTo" :removeTableFrom="removeTableFrom" @readyToServe="serveTable($event)"/>
-     <BusyTableCard :busy_tables="busy_tables" @freeThisTable="unasign($event)"
-     />
+      <div class="mydiv col-3 bg-grey-4">
+        <TableCard :tables="free_tables" @asignThisTable="asignTable($event)"
+        />
+      </div>
+
+      <div class="mydiv col-3 bg-grey-4">
+        <WaiterList :waiters="waiters" :addTableTo="addTableTo" :removeTableFrom="removeTableFrom" @readyToServe="serveTable($event)"/>
+      </div>
+
+      <div class="mydiv col-3 bg-grey-4">
+        <BusyTableCard :busy_tables="busy_tables" @freeThisTable="unasign($event)"
+        />  
+     </div>
 
     </div>
-  </div>
+
+     <div class="row reservation-div justify-around">
+      <ReservationCard :reservations="reservations"/>
+      </div>
+    </div>
+  
 </template>
 <script>
 import TableCard from 'components/TableCard.vue'
 import WaiterList from 'components/WaiterList.vue'
 import BusyTableCard from 'components/BusyTableCard.vue'
+import ReservationTableCard from 'components/ReservationCard.vue'
 import axios from 'axios'
+import ReservationCard from '../components/ReservationCard.vue'
 //TODO: comunicarse con el hermano
 export default {
   name: 'MainPage',
   components: {
     TableCard,
     WaiterList,
-    BusyTableCard
+    BusyTableCard,
+    ReservationCard
 
   },
   data(){
@@ -33,6 +62,7 @@ export default {
       waiters:[],
       free_tables:[],
       busy_tables:[],
+      reservations:[],
       waiter:"",
       waiterSelected:false,
       tableSelected:{},
@@ -43,11 +73,14 @@ export default {
   created( ){
     axios.all([
       axios.get('http://18.229.150.241:8081/admin/tables/',{ crossDomain: true }),
-      axios.get('http://18.229.150.241:8081/admin/waiters/',{ crossDomain: true })
+      axios.get('http://18.229.150.241:8081/admin/waiters/',{ crossDomain: true }),
+      axios.get('http://localhost:8082/reservations/today/',{ crossDomain: true })
+      
     ])  
-    .then(axios.spread((tableRes, waiterRes) => {
+    .then(axios.spread((tableRes, waiterRes,resRes) => {
         this.tables = tableRes.data.tables,
-        this.waiters=waiterRes.data,  
+        this.waiters=waiterRes.data,
+        this.reservations=resRes.data,  
         this.tables.forEach(table => {
           if(table.waiterId === null){
             this.free_tables.push(table)
@@ -62,7 +95,8 @@ export default {
            });
             
           }
-        })}))
+        })
+      }))
     },
   methods: {
     //TODO: Implement API communication using AXIOS
@@ -129,17 +163,3 @@ export default {
 
 
 </script>
-
-<style lang="scss">
-.colu {
-background: #DCDCDC;
-border-radius: 10px;
-padding: 1%;
-}
-
-.doc-container {
-background: #F5F5F5;
-border-radius: 10px;
-padding: 1%;
-}
-</style>
