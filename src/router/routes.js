@@ -6,8 +6,6 @@ const routes = [
     //component: () => import('layouts/ReceptionLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Main.vue') },
-      { path: '/meseros', component: () => import('pages/Meseros.vue') },
-      { path: '/reservas', component: () => import('pages/Reservas.vue') },
     ]
   },
 

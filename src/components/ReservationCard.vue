@@ -1,25 +1,21 @@
 <template>
-  <div>
-    <q-card style="width: 100% "
+  <div class="row" style="max-width:5000px">
+    <q-card style="width: 100px "
       v-for="reservation in reservations.reservations"
       :key="reservation.customerId"
     >       
        <q-card-section class="items-center no-wrap">
           <div>
-            <div class="text-center">Nombre: {{reservation.name}}</div>
-            <div class="text-center">ID Cliente: {{reservation.userId}}</div>
-             <div class="text-center">Hora: {{reservation.reservationTime}}</div>
+             <div class="text-center">{{reservation.reservationTime}}</div>
+             <div class="text-center">ID: {{reservation.userId}}</div>
+            <div class="text-center">Nombre: </div>
+            <div class="text-center">{{reservation.name}}</div>
+            
            
           </div>
        </q-card-section>
 
-      <q-separator />
 
-      <q-card-actions horizontal>
-        <q-btn flat color="green" @click="asign(table)" >Reservar</q-btn>
-         <q-btn flat color="red" @click="asign(table)" >Eliminar</q-btn>
-
-      </q-card-actions>
 
 
     </q-card>
@@ -30,7 +26,7 @@
 
 <script>
 
-import io from 'socket.io-client';
+
 
 export default {
   name: 'ReservationCard',
@@ -39,7 +35,6 @@ export default {
   },
   data () {
     return {
-       socket: io("http://localhost:3001"),
        seamless: false
     }
   },
@@ -55,13 +50,7 @@ export default {
     }
   },
   created(){
-    console.log(this.reservations)
-  },
-  mounted() {
-      this.socket.on('newReservation', (data) => {
-       console.log("new reservation PogChamp")
-       console.log(data);
-      });
-    }
+  }
+  
   }
 </script>
