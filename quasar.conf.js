@@ -4,7 +4,7 @@
  */
 
 const { Dialog } = require("quasar")
-
+require('dotenv').config();
 // Configuration for your app
 // https://quasar.dev/quasar-cli/quasar-conf-js
 /* eslint-env node */
@@ -78,7 +78,7 @@ cfg.module.rules.push({
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
       https: false,
-      port: 8080,
+      port: process.env.PORT || 8080,
       open: true // opens browser window automatically
     },
 

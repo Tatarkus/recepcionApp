@@ -28,7 +28,7 @@
 
       <div class="mydiv col-3 bg-grey-4">
         <BusyTableCard :busy_tables="busy_tables" @freeThisTable="unasign($event)"
-        />  
+        />
      </div>
 
     </div>
@@ -45,7 +45,7 @@
           <div class="text-center inputNumber">
           <q-btn  @keyup.esc="onCancelButtonClick" @keyup.enter="onOkButtonClick" class="number" v-for="n in numbers" :key=n color="primary" @click="inputNumber(n)" >
             {{n}}
-            
+
           </q-btn>
           <q-btn  @keyup.esc="onCancelButtonClick" class="number" color="primary" @click="inputClientId=0" label="BORRAR"/>
           <q-btn  @keyup.esc="onCancelButtonClick" @keyup.enter="onOkButtonClick" class="number"  color="primary" @click="inputNumber(0)" :label="0"/>
@@ -53,11 +53,11 @@
           </div>
         </q-card-section>
 
-        
+
         <q-card-section class="q-pt-none">
           <q-input dense placeholder="0"
           v-model="inputClientId"
-          autofocus 
+          autofocus
           @keyup.enter="onOkButtonClick"
           @keyup.esc="onCancelButtonClick"
           mask="#####"
@@ -67,7 +67,7 @@
     </q-dialog>
 
     </div>
-  
+
 </template>
 <script>
 import TableCard from 'components/TableCard.vue'
@@ -91,7 +91,7 @@ export default {
   data(){
     return {
       numbers: [1,2,3,4,5,6,7,8,9],
-      socket: io("http://18.229.150.241:3001"),
+      socket: io("http://localhost:3001"),
       resolve: null,
       customer: {},
       customers: [],
@@ -111,45 +111,52 @@ export default {
     }
   },
   created( ){
+    //TODO: refractor this to handle each responses
+    //and/or handling promises manually
     axios.all([
-      axios.get('http://18.229.150.241:8081/admin/tables/',{ crossDomain: true }),
-      axios.get('http://18.229.150.241:8081/admin/waiters/',{ crossDomain: true }),
-      axios.get('http://18.229.150.241:8082/reservations/today/',{ crossDomain: true }),
-      axios.get('http://18.229.150.241:8081/admin/customers/',{ crossDomain: true })
-      
-    ])  
+      axios.get('http://localhost:8081/admin/tables/',{ crossDomain: true }),
+      axios.get('http://localhost:8081/admin/waiters/',{ crossDomain: true }),
+      axios.get('http://localhost:8082/reservations/today/',{ crossDomain: true }),
+      axios.get('http://localhost:8081/admin/customers/',{ crossDomain: true })
+
+    ]).catch(error => {
+        console.log(error)
+      })
     .then(axios.spread((tableRes, waiterRes,resRes, customersRes) => {
         this.tables = tableRes.data.tables,
-        this.waiters=waiterRes.data,
-        this.reservations=resRes.data,
+        this.waiters = waiterRes.data,
+        this.reservations = resRes.data,
         this.customers = customersRes.data.customers
         var curCustomer = { name: "No ID", id:0}
+                console.log(resRes.data)
+
+        console.log(this.reservations)
+
         this.tables.forEach(table => {
-          
+
           if(table.waiterId === null){
             this.free_tables.push(table)
           } else{
-           this.waiters.forEach(waiter => {  
-             if(waiter.id === table.waiterId){   
-              table.waiter = waiter.name           
+           this.waiters.forEach(waiter => {
+             if(waiter.id === table.waiterId){
+              table.waiter = waiter.name
              }
            })
-           this.customers.forEach(customer => {  
-             if(customer.id === table.customerId){ 
+           this.customers.forEach(customer => {
+             if(customer.id === table.customerId){
               curCustomer = customer
              }
            })
             table.customer = curCustomer
-            this.busy_tables.push(table)      
+            this.busy_tables.push(table)
           }
-
         })
     }))
   },
    mounted() {
       this.socket.on('newReservation', async (data) => {
        console.log("changing reservations")
-       let res = await axios.get('http://18.229.150.241:8082/reservations/today/',{ crossDomain: true })
+       let res = await axios.get('http://localhost:8082/reservations/today/',{ crossDomain: true })
        this.reservations = res.data
       });
     },
@@ -174,13 +181,13 @@ export default {
               {
                 name: "No ID",
                 id:null
-              } 
+              }
               this.resolve && this.resolve('ok')
           this.dialog = false
           } else {
 
-          
-          let res = await axios.get('http://18.229.150.241:8081/admin/customers/'+this.inputClientId,{ crossDomain: true })
+
+          let res = await axios.get('http://localhost:8081/admin/customers/'+this.inputClientId,{ crossDomain: true })
           this.customer = res.data.customer[0]
           this.inputClientId = 0
           this.resolve && this.resolve('ok')
@@ -195,7 +202,7 @@ export default {
           this.inputClientId = 0
         },
 
-        async asignTable(table, reservation) {       
+        async asignTable(table, reservation) {
           if(this.waiterSelected) {
             const confirmation = await this.showing()
             if(confirmation == 'cancel')
@@ -218,7 +225,7 @@ export default {
               {
                 customerId:this.customer.id,
                 waiterId:this.waiter.id,
-                  
+
               }
               this.busy_tables.push(busyTable)
 
@@ -226,9 +233,9 @@ export default {
                   if(this.free_tables[i]==table)
                   this.free_tables.splice(i,1)
               }
-              
+
               axios
-                .put('http://18.229.150.241:8081/admin/tables/'+busyTable.id,updateTable)
+                .put('http://localhost:8081/admin/tables/'+busyTable.id,updateTable)
               this.addTableTo = this.waiter
               this.waiter=""
               this.waiterSelected=false
@@ -246,7 +253,7 @@ export default {
              table.customerId=null
              this.free_tables.push(table)
              axios
-              .put('http://18.229.150.241:8081/admin/tables/'+table.id,table)
+              .put('http://localhost:8081/admin/tables/'+table.id,table)
              for (var i = 0; i < this.busy_tables.length; i++) {
                if(this.busy_tables[i]==table)
                 this.busy_tables.splice(i,1)
